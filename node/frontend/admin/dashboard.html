@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"> 
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+    }
+    header {
+      background-color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: flex-end;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .logout {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    .logout:hover {
+      background-color: #0056b3;
+    }
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      display: grid;
+      grid-gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+    .card {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card h3 {
+      font-size: 20px;
+      margin-top: 0;
+      color: #333;
+    }
+    .card p {
+      color: #666;
+    }
+    .card a {
+      display: inline-block;
+      margin-top: 10px;
+      text-decoration: none;
+      color: #007bff;
+      font-weight: bold;
+      transition: color 0.3s ease;
+    }
+    .card a:hover {
+      color: #0056b3;
+    }
+    .icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+      color: #007bff;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="logout" onclick="logout()">Logout</button>
+  </header>
+  <div class="container">
+    <div class="card">
+      <i class="fas fa-users icon"></i>
+      <h3>Manage Users</h3>
+      <p>Manage user accounts, permissions, and profiles.</p>
+      <a href="manage_users.html">Go to Users</a>
+    </div>
+    <div class="card">
+      <i class="far fa-calendar-alt icon"></i>
+      <h3>Manage Events</h3>
+      <p>Organize and manage upcoming events and schedules.</p>
+      <a href="manage_events.html">Go to Events</a>
+    </div>
+  </div>
+  <script>
+    function deleteCookie(name) {
+      document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
+    }
+
+    function logout() {
+      deleteCookie('session_token');
+      deleteCookie('user_token');
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('authToken');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

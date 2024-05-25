@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+        <div class="logo">Logo</div>
+        <div class="menu-toggle">&#9776;</div>
+        <ul id="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#recent-events">Recent Events</a></li>
+            <li><a href="#how-to-buy">How to Buy</a></li>
+            <li><a href="#" id="logout-link" style="display: none;">Logout</a></li>
+            <li><a href="login.html" id="login-link">Login</a></li>
+            <li><a href="signup.html" id="signup-link">Register</a></li>  
+        </ul>
+    </div>
+</nav>
+<div class="hero-image">
+  <div class="hero-content">
+      <h1>Welcome to Our Website</h1>
+  </div>
+</div>
+
+<h1 class="center"><u>Recent event</u></h1> 
+  <div class="mk">
+  <div id="event-container"></div>
+  </div>
+  
+
+  <div id="popup" class="popup">
+    <div class="popup-content">
+      <span class="close">&times;</span>
+      <h2>Event Details</h2>
+      <p id="popup-event-details"></p>
+      <button   id="popup-checkoutButton"> </button>
+    </div>
+  </div>
+  <div class="how-to-buy" id="how-to-buy">
+    <h2>How to Buy a Ticket</h2>
+    <div class="steps">
+        <div class="step"><p><strong>Step 1:</strong> Visit our website and navigate to the 'Tickets' section.</p></div>
+        <div class="step"><p><strong>Step 2:</strong> Select the event you want to attend and click 'Buy Ticket'.</p></div>
+        <div class="step"><p><strong>Step 3:</strong> Check the available ticket.</p></div>
+        <div class="step"><p><strong>Step 4:</strong> Make the payment through our secure payment gateway.</p></div>
+        <div class="step"><p><strong>Step 5:</strong> Receive a confirmation email with your ticket.</p></div>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2024 Mayank Kumar Shrivastva. All rights reserved.</p>
+</footer>
+ 
+
+<script>
+  document.querySelector('.menu-toggle').addEventListener('click', function() {
+      document.querySelector('nav ul').classList.toggle('active');
+  });
+
+  document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      const loginLink = document.getElementById('login-link');
+      const signupLink = document.getElementById('signup-link');
+      const logoutLink = document.getElementById('logout-link');
+
+      if (token) {
+          loginLink.style.display = 'none';
+          signupLink.style.display = 'none';
+          logoutLink.style.display = 'block';
+
+          logoutLink.addEventListener('click', () => {
+              localStorage.removeItem('token');
+              window.location.href = 'login.html';
+          });
+      } else {
+          loginLink.style.display = 'block';
+          signupLink.style.display = 'block';
+          logoutLink.style.display = 'none';
+      }
+  });
+
+  async function loadEvents() {
+      try {
+          const response = await fetch('http://localhost:3000/events');
+          if (!response.ok) {
+              throw new Error('Failed to fetch events');
+          }
+          const events = await response.json();
+          const eventsContainer = document.getElementById('events-container');
+          eventsContainer.innerHTML = events.map(event => `
+              <div class="event">
+                  <h3>${event.Title}</h3>
+                  <p>${event.Description}</p>
+                  <p>Date: ${new Date(event.Date).toLocaleDateString()}</p>
+              </div>
+          `).join('');
+      } catch (error) {
+          console.error('Error fetching events:', error);
+      }
+  }
+
+  loadEvents();
+</script>
+ 
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('http://localhost:3000/events');
+        if (!response.ok) {
+          throw new Error('Failed to fetch events');
+        }
+        const events = await response.json();
+        const eventContainer = document.getElementById('event-container');
+        
+        events.forEach(event => {
+          const eventCard = document.createElement('div');
+          eventCard.classList.add('event-card');
+          eventCard.innerHTML = `
+            <h3>${event.Title}</h3>
+            <p><strong>Date:</strong> ${event.date}</p>
+            <p><strong>Time:</strong> ${event['start-time']} - ${event['End-time']}</p>
+            <p><strong>Available:</strong> ${event.available}</p>
+            <p><strong>Remaining Tickets:</strong> ${event['remaining-ticket']}</p>
+            <p><strong>Venue:</strong> ${event.venue}</p>
+            <p><strong>Price:</strong> ${event.Price}</p>
+            <button class="buy-now" data-id="${event.id}">See Details</button>
+          `;
+          eventContainer.appendChild(eventCard);
+        });
+
+        const popup = document.getElementById("popup");
+        const closeBtn = document.querySelector(".close");
+        const checkoutButton = document.getElementById('popup-checkoutButton');
+        let selectedEventId;
+
+        document.querySelectorAll('.buy-now').forEach(button => {
+          button.addEventListener('click', (event) => {
+            selectedEventId = event.target.getAttribute('data-id');
+            const eventDetails = events.find(e => e.id == selectedEventId);
+
+            if (eventDetails) {
+              document.getElementById('popup-event-details').innerHTML = `
+                <p><strong>Title:</strong> ${eventDetails.Title}</p>
+                <p><strong>Date:</strong> ${eventDetails.date}</p>
+                <p><strong>Start Time:</strong> ${eventDetails['start-time']}</p>
+                <p><strong>End Time:</strong> ${eventDetails['End-time']}</p>
+                <p><strong>Available:</strong> ${eventDetails.available}</p>
+                <p><strong>Remaining Tickets:</strong> ${eventDetails['remaining-ticket']}</p>
+                <p><strong>Venue:</strong> ${eventDetails.venue}</p>
+                <p><strong>Price:</strong> ${eventDetails.Price}</p>
+              `;
+
+              popup.style.display = "block";
+            }
+          });
+        });
+
+        checkoutButton.addEventListener('click', () => {
+          window.location.href = ` `;
+        });
+
+        closeBtn.onclick = function() {
+          popup.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+         
+          if (event.target == popup) {
+            popup.style.display = "none";
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const navbarToggle = document.getElementById('navbar-toggler');
+      const navbarLinks = document.querySelector('.navbar-links');
+    
+      navbarToggle.addEventListener('click', () => {
+        navbarLinks.classList.toggle('active');
+      });
+    });
+  </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        window.location.href = 'dashboard.html';
+      }
+    });
+  </script>
+</body>
+</html>

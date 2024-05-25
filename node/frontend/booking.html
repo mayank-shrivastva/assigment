@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booking</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/booking.css">
+</head>
+<body>
+  <nav>
+    <div class="nav-container">
+      <div class="logo">Logo</div>
+      <div class="menu-toggle">&#9776;</div>
+      <ul id="nav-links">
+        <li><a href="#" id="logout">Logout</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <h1>My Bookings</h1>
+
+  <table id="bookings-table">
+    <thead>
+      <tr>
+        <th>Event Name</th>
+        <th>Event date</th>
+        <th>Start time</th>
+        <th>End time</th>
+        <th>Venue</th>
+        <th>Amount</th>
+        <th>Quantity</th>
+        <th>Booking date</th>
+        <th>Cancel</th>
+      </tr>
+    </thead>
+    <tbody id="bookings-body">
+    </tbody>
+  </table>
+  <footer>
+    <p>&copy; 2024 Mayank Kumar Shrivastva. All rights reserved.</p>
+  </footer>
+  <script src="js/booking.js"></script>
+  <script>
+     
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        window.location.href = 'login.html';
+      }
+    });
+  </script>
+</body>
+</html>

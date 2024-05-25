@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/signup.css">
+   
+  <title>signup and Signup</title>
+</head>
+<body>
+  <script>
+    // Redirect to dashboard if already logged in
+    document.addEventListener('DOMContentLoaded', () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        window.location.href = 'dashboard.html';
+      }
+    });
+  </script>
+   
+    <div class="container">
+       <form id="signup-form" class="signup-form">
+  <h2>Signup</h2>
+      <div class="form-group">
+        <label for="signup-username">Email:</label>
+        <input type="text" id="signup-username" name="email" required>
+      </div>
+      <div class="form-group">
+        <label for="signup-password">Password:</label>
+        <input type="password" id="signup-password" name="password" required>
+      </div>
+      <button type="submit">signup</button>
+      </form></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const signupForm = document.getElementById('signup-form');
+    signupForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(signupForm);
+      try {
+        const response = await fetch('http://localhost:3000/admin/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(Object.fromEntries(formData))
+        });
+        if (!response.ok) {
+          throw new Error('Signup failed');
+        }
+        alert('Signup successful');
+      } catch (error) {
+        console.error('Signup error:', error);
+        alert('Signup failed');
+      }
+    });
+  });
+  </script>
+</body>
+</html>

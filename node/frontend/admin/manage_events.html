@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Events</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <style>
+    header {
+      background-color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: flex-end;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .logout {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    .logout:hover {
+      background-color: #0056b3;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    button {
+      padding: 8px 12px;
+      margin: 4px;
+      background-color: #007BFF;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .container {
+      background-color: #fff;
+      padding: 20px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      padding-top: 100px;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="logout" onclick="logout()">Logout</button>
+  </header>
+  <div class="container">
+    <h2>Manage Events</h2>
+    <div id="eventsList">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+            <th>Available</th>
+            <th>Remaining Tickets</th>
+            <th>Venue</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="eventsTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2>Edit Event</h2>
+      <form id="editEventForm">
+        <input type="hidden" id="editEventId">
+        <label for="editTitle">Title:</label><br>
+        <input type="text" id="editTitle" name="title"><br>
+        <label for="editDate">Date:</label><br>
+        <input type="date" id="editDate" name="date"><br>
+        <label for="editStartTime">Start Time:</label><br>
+        <input type="time" id="editStartTime" name="start-time"><br>
+        <label for="editEndTime">End Time:</label><br>
+        <input type="time" id="editEndTime" name="end-time"><br>
+        <label for="editAvailable">Available:</label><br>
+        <input type="number" id="editAvailable" name="available"><br>
+        <label for="editRemainingTickets">Remaining Tickets:</label><br>
+        <input type="number" id="editRemainingTickets" name="remaining-tickets"><br>
+        <label for="editVenue">Venue:</label><br>
+        <input type="text" id="editVenue" name="venue"><br>
+        <label for="editPrice">Price:</label><br>
+        <input type="number" id="editPrice" name="price"><br><br>
+        <button type="submit">Save Changes</button>
+      </form>
+    </div>
+  </div>
+  <script>
+    let events = [];  
+    async function fetchEvents() {
+      try {
+        const response = await fetch('http://localhost:3000/events');
+        events = await response.json();
+
+        const eventsTableBody = document.getElementById('eventsTableBody');
+        eventsTableBody.innerHTML = '';  
+
+        events.forEach(event => {
+          const eventRow = document.createElement('tr');
+          eventRow.innerHTML = `
+            <td>${event.Title}</td>
+            <td>${event.date}</td>
+            <td>${event['start-time']}</td>
+            <td>${event['End-time']}</td>
+            <td>${event.available}</td>
+            <td>${event['remaining-ticket']}</td>
+            <td>${event.venue}</td>
+            <td>${event.Price}</td>
+            <td>
+              <button onclick="editEvent(${event.id})">Edit</button>
+              <button onclick="deleteEvent(${event.id})">Delete</button>
+            </td>
+          `;
+          eventsTableBody.appendChild(eventRow);
+        });
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    }
+    function editEvent(eventId) {
+      const event = events.find(event => event.id === eventId);
+      if (!event) {
+        console.error('Event not found:', eventId);
+        return;
+      }
+      document.getElementById('editEventId').value = event.id;
+      document.getElementById('editTitle').value = event.Title;
+      document.getElementById('editDate').value = event.date;
+      document.getElementById('editStartTime').value = event['start-time'];
+      document.getElementById('editEndTime').value = event['End-time'];
+      document.getElementById('editAvailable').value = event.available;
+      document.getElementById('editRemainingTickets').value = event['remaining-ticket'];
+      document.getElementById('editVenue').value = event.venue;
+      document.getElementById('editPrice').value = event.Price;
+ 
+      const modal = document.getElementById('editModal');
+      modal.style.display = 'block';
+    }
+ 
+    async function deleteEvent(eventId) {
+      if (confirm('Are you sure you want to delete this event?')) {
+        try {
+          const response = await fetch(`http://localhost:3000/events/${eventId}`, { method: 'DELETE' });
+          const data = await response.json();
+          console.log(data.message);
+          
+          fetchEvents();
+        } catch (error) {
+          console.error('Error deleting event:', error);
+        }
+      }
+    }
+
+     document.querySelector('.close').onclick = function() {
+      const modal = document.getElementById('editModal');
+      modal.style.display = 'none';
+    }
+
+     window.onclick = function(event) {
+      const modal = document.getElementById('editModal');
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    }
+
+     document.getElementById('editEventForm').onsubmit = async function(event) {
+      event.preventDefault();
+      const eventId = document.getElementById('editEventId').value;
+      const updatedEvent = {
+        Title: document.getElementById('editTitle').value,
+        date: document.getElementById('editDate').value,
+        'start-time': document.getElementById('editStartTime').value,
+        'End-time': document.getElementById('editEndTime').value,
+        available: document.getElementById('editAvailable').value,
+        'remaining-ticket': document.getElementById('editRemainingTickets').value,
+        venue: document.getElementById('editVenue').value,
+        Price: document.getElementById('editPrice').value
+      };
+
+      try {
+        const response = await fetch(`http://localhost:3000/events/${eventId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(updatedEvent)
+        });
+        const data = await response.json();
+        console.log(data.message);
+         const modal = document.getElementById('editModal');
+        modal.style.display = 'none';
+         fetchEvents();
+      } catch (error) {
+        console.error('Error updating event:', error);
+      }
+    };
+
+     fetchEvents();
+  </script>
+  <script>
+    function deleteCookie(name) {
+      document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
+    }
+
+    function logout() {
+       deleteCookie('session_token');
+      deleteCookie('user_token');
+     
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('authToken');
+ 
+      window.location.href = 'index.html';
+    }
+  </script>
+  <script>
+    function deleteCookie(name) {
+      document.cookie = name + '=; Max-Age=0; path=/; domain=' + location.hostname;
+      console.log('Deleted cookie:', name);
+    }
+  
+    function logout() {
+       
+      deleteCookie('session_token');
+      deleteCookie('user_token');
+     
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('authToken');
+  
+       window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
